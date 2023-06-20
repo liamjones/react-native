@@ -184,7 +184,7 @@ class CircleCIArtifacts {
     return body.items
   }
 
-  async getJobsArtifacts(jobNumber){
+  async #getJobsArtifacts(jobNumber){
     const options = {
       method: 'GET',
       url: `https://circleci.com/api/v2/project/gh/facebook/react-native/${jobNumber}/artifacts`,
@@ -199,8 +199,12 @@ class CircleCIArtifacts {
 
   async #findUrlForJob(jobName, artifactPath) {
     const job = this.jobs.find(job => job.name === jobName);
-    const artifacts = await this.getJobsArtifacts(job.job_number);
+    const artifacts = await this.#getJobsArtifacts(job.job_number);
     return artifacts.find(artifact => artifact.path.indexOf(artifactPath) > -1).url;
+  }
+
+  async artifactURLHermesDebug() {
+    return this.#findUrlForJob('build_hermes_macos-Debug', 'hermes-ios-debug.tar.gz');
   }
 
   async artifactURLForMavenLocal() {
@@ -211,9 +215,7 @@ class CircleCIArtifacts {
     return this.#findUrlForJob('build_and_publish_npm_package-2', 'react-native-1000.0.0-');
   }
 
-  async artifactURLHermesDebug() {
-    return this.#findUrlForJob('build_hermes_macos-Debug', 'hermes-ios-debug.tar.gz');
-  }
+
 }
 
 module.exports = {
